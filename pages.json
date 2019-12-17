@@ -1,0 +1,39 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "自助售货机"
+			}
+		}, {
+			"path": "pages/loadding/loadding",
+			"style": {
+				"navigationBarTitleText": "设备连接中"
+			}
+		}, {
+			"path": "pages/buy/buy",
+			"style": {
+				"navigationBarTitleText": "商品购买"
+			}
+		}, {
+			"path": "pages/order/order",
+			"style": {
+				"navigationBarTitleText": "订单确认"
+			}
+		},
+		{
+		    "path" : "pages/buyfinish/buyfinish",
+		    "style": {
+		    	"navigationBarTitleText": "购买成功"
+		    }
+		}
+		
+        
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "自助售货机",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#FFFFFF"
+	}
+}

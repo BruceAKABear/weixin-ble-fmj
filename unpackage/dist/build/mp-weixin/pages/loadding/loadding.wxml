@@ -1,0 +1,1 @@
+<view class="content"><view class="loadding-frame"><view class="loadding-frame-inner"><image class="loaddingPic" src="../../static/chongdian.png"></image><view><image class="loadProgress" src="../../static/load.gif"></image></view><view class="loadding-desc"><text>正在连接设备，请勿关闭页面</text></view></view><join-us vue-id="1" hotline="{{joinPhone}}" bind:__l="__l"></join-us></view></view>

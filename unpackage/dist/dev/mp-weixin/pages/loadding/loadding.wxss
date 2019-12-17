@@ -1,0 +1,38 @@
+
+.loadding-frame {
+	position: fixed;
+	top: 0;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	width: 100%;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	    -ms-flex-pack: center;
+	        justify-content: center;
+	padding-top: 40rpx;
+}
+.loadding-frame-inner {
+	text-align: center;
+}
+.loaddingPic {
+	width: 300rpx;
+	height: 300rpx;
+	margin-top: 100rpx;
+}
+.loadding-desc {
+	margin-top: 10rpx;
+	font-size: 22rpx;
+	color: #BBBBBB;
+}
+.loadProgress {
+	height: 10rpx;
+	width: 300rpx;
+}
+.text {
+	color: #BBBBBB;
+	font-size: 28rpx;
+	padding: 5rpx;
+}
+

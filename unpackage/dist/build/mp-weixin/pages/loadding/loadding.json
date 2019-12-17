@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "设备连接中",
+  "usingComponents": {
+    "join-us": "/components/join-us/join-us"
+  }
+}

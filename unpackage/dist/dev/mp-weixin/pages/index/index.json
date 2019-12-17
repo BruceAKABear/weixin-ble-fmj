@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "自助售货机",
+  "usingComponents": {
+    "uni-icon": "/components/uni-icons/uni-icons",
+    "join-us": "/components/join-us/join-us"
+  }
+}

@@ -1,0 +1,1 @@
+<view class="agent-box"><view class="agent-box-info"><text>了解更多共享便民设备合作、加盟、代理</text></view><view class="agent-box-contact"><text>请电联或关注微信公众号</text><view data-event-opts="{{[['tap',[['callForJoin']]]]}}" bindtap="__e"><text style="color:#29c1c2;">【亿联物联】</text></view></view></view>
