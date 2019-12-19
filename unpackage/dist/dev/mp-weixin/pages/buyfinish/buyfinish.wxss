@@ -85,6 +85,11 @@
 }
 .product-info-name.data-v-b0acab06 {
 	font-size: 40rpx;
+	max-width: 250rpx;
+	-o-text-overflow: ellipsis;
+	   text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
 }
 .product-info-desc.data-v-b0acab06 {
 	color: #999999;

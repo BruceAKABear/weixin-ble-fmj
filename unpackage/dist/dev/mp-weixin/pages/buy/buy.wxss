@@ -60,6 +60,18 @@
 	    -ms-flex-pack: center;
 	        justify-content: center;
 }
+.goods-item-inner-pic-tunnel{
+	position: relative;
+}
+.goods-item-inner-tunnel-number{
+	position: absolute;
+	top: 10rpx;
+	left: 10rpx;
+	background-color: #B2B2B2;
+	opacity: 0.7;
+	font-size: 20rpx;
+	border-radius: 10rpx;
+}
 .goods-item-inner-pic {
 	width: 190rpx;
 	height: 190rpx;

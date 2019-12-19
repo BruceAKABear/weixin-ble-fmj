@@ -188,6 +188,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+
 var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};var ownKeys = Object.keys(source);if (typeof Object.getOwnPropertySymbols === 'function') {ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {return Object.getOwnPropertyDescriptor(source, sym).enumerable;}));}ownKeys.forEach(function (key) {_defineProperty(target, key, source[key]);});}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}var uniIcon = function uniIcon() {return __webpack_require__.e(/*! import() | components/uni-icons/uni-icons */ "components/uni-icons/uni-icons").then(__webpack_require__.bind(null, /*! ../../components/uni-icons/uni-icons.vue */ 58));};var uniNumberBox = function uniNumberBox() {return __webpack_require__.e(/*! import() | components/uni-number-box/uni-number-box */ "components/uni-number-box/uni-number-box").then(__webpack_require__.bind(null, /*! ../../components/uni-number-box/uni-number-box.vue */ 72));};var _default =
 
 
@@ -197,7 +200,7 @@ var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {
 {
   data: function data() {
     return {
-      defaultImg: '../../static/chongdianqi.png',
+      defaultImg: '../../static/prod.png',
       goodsList: [],
       banner: '',
       //商场地址
@@ -424,9 +427,6 @@ var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {
     },
     showText: function showText() {
       var selectedCommitGoodsArray = this.commitGoodsArray;
-      console.log('存在的商品', selectedCommitGoodsArray);
-
-
       if (selectedCommitGoodsArray.length == 0) {
         return '未选购商品';
       } else {

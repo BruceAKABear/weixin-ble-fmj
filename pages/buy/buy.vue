@@ -10,7 +10,10 @@
 				<!-- 根据available判断商品是否可用 -->
 				<view class="goods-item-inner">
 					<!-- 产品图片 -->
-					<view class="">
+					<view class="goods-item-inner-pic-tunnel">
+						<view class="goods-item-inner-tunnel-number">
+							通道号:{{goods.id}}
+						</view>
 						<image class="goods-item-inner-pic" :src="goods.goods.imgUrl?goods.goods.imgUrl:defaultImg"></image>
 					</view>
 					<!-- 产品名称 -->
@@ -73,7 +76,7 @@
 	export default {
 		data() {
 			return {
-				defaultImg: '../../static/chongdianqi.png',
+				defaultImg: '../../static/prod.png',
 				goodsList: [],
 				banner: '',
 				//商场地址
@@ -300,9 +303,6 @@
 			},
 			showText() {
 				let selectedCommitGoodsArray = this.commitGoodsArray
-				console.log('存在的商品',selectedCommitGoodsArray)
-				
-				
 				if (selectedCommitGoodsArray.length == 0) {
 					return '未选购商品'
 				} else {
@@ -370,6 +370,19 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
+	}
+	.goods-item-inner-pic-tunnel{
+		position: relative;
+	}
+	.goods-item-inner-tunnel-number{
+		position: absolute;
+		top: 10rpx;
+		left: 10rpx;
+		background-color: #B2B2B2;
+		opacity: 0.7;
+		font-size: 20rpx;
+		border-radius: 10rpx;
+		
 	}
 
 	.goods-item-inner-pic {

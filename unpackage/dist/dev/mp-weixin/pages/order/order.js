@@ -297,7 +297,6 @@ var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {
                   success: function success(res) {
                     if (res.data.code === 1) {(function () {
                         var chargeTimeOrder = res.data.order;
-                        console.log('实际命令长度为', chargeTimeOrder.length);
                         if (chargeTimeOrder.length <= 40) {
                           uni.writeBLECharacteristicValue({
                             deviceId: that.deviceId,
@@ -323,7 +322,6 @@ var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {
                                       uni.closeBLEConnection({
                                         deviceId: that.deviceId,
                                         success: function success(res) {
-                                          console.log(res);
                                         } });
 
                                       uni.hideLoading();
@@ -362,7 +360,6 @@ var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {
                         } else {
                           var orderTime = Math.floor(chargeTimeOrder.length / 40);
                           for (var i = 0; i <= orderTime; i++) {
-                            console.log('实际命令为', chargeTimeOrder);
                             console.log('第' + i + '次的命令', chargeTimeOrder.substring(i * 40, (i + 1) * 40));
 
                             uni.writeBLECharacteristicValue({
@@ -774,7 +771,6 @@ var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {
               uni.closeBLEConnection({
                 deviceId: that.deviceId,
                 success: function success(res) {
-                  console.log('10003中连接断开');
                 } });
 
               that.sanAndConnectBle();

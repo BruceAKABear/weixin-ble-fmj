@@ -18,7 +18,7 @@
 						</view>
 						<view class="product-info">
 							<text class="product-info-name">{{goodsoObj.product.goods.name}}</text>
-							<text class="product-info-desc">测试产品描述描述</text>
+							<text class="product-info-desc"></text>
 						</view>
 						<view class="product-number">
 							<text>X{{goodsoObj.number}}</text>
@@ -165,6 +165,10 @@
 
 	.product-info-name {
 		font-size: 40rpx;
+		max-width: 250rpx;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
 	.product-info-desc {
