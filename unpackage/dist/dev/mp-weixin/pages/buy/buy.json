@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "商品购买",
   "usingComponents": {
-    "uni-icon": "/components/uni-icons/uni-icons"
+    "uni-icon": "/components/uni-icons/uni-icons",
+    "uni-number-box": "/components/uni-number-box/uni-number-box"
   }
 }

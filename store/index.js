@@ -27,7 +27,7 @@ const store = new Vuex.Store({
 		//用户id
 		userId: '',
 		//设备imei
-		deviceImei: '',
+		deviceImei: '60000006',
 		//查询出来的设备的id
 		deviceId: '',
 		//真实设备名称

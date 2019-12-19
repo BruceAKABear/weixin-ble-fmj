@@ -10,12 +10,14 @@
 			"style": {
 				"navigationBarTitleText": "设备连接中"
 			}
-		}, {
+		},
+		{
 			"path": "pages/buy/buy",
 			"style": {
 				"navigationBarTitleText": "商品购买"
 			}
-		}, {
+		},
+		{
 			"path": "pages/order/order",
 			"style": {
 				"navigationBarTitleText": "订单确认"

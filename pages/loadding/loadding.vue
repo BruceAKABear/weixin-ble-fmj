@@ -359,6 +359,22 @@
 								success(res) {
 									//判断是否是自己的设备,只能通过name来判断
 									var devicesArray = res.devices
+									//长度为零就是没找到任何设备
+									if (devicesArray.length == 0) {
+										uni.showModal({
+											title: '',
+											content: '未搜索到设备,请靠近设备后重试',
+											showCancel: false,
+											success: (res) => {
+												if (res.confirm) {
+													uni.redirectTo({
+														url: '../index/index'
+													})
+
+												}
+											}
+										})
+									}
 									var deviceFound = false
 									for (let i = 0; i < devicesArray.length; i++) {
 										//2.1 如果设备名不存在直接跳出继续下次判断
@@ -375,7 +391,7 @@
 											that.setDeviceId(devicesArray[i].deviceId)
 											that.connectBle()
 										}
-										if ((i == devicesArray.length-1) && (!deviceFound)) {
+										if ((i == devicesArray.length - 1) && (!deviceFound)) {
 											uni.showModal({
 												title: '',
 												content: '未搜索到设备,请靠近设备后重试',
@@ -395,9 +411,7 @@
 							})
 						}, 4000)
 						//2. 会异步回调这个方法
-						uni.onBluetoothDeviceFound((res) => {
-
-						})
+						uni.onBluetoothDeviceFound((res) => {})
 					},
 					fail(res) {
 						uni.showModal({
@@ -543,6 +557,7 @@
 						fail(res) {
 							//处理10003
 							if (res.errCode === 10003) {
+								console.log('连接10003')
 								//1. 断连接
 								uni.closeBLEConnection({
 									deviceId: that.deviceId,
@@ -551,7 +566,7 @@
 									}
 								})
 								that.sanAndConnectBle()
-								
+
 							} else {
 								uni.showModal({
 									title: '',
@@ -573,6 +588,63 @@
 					})
 				}
 
+			},
+			judgeLocationOpen(params) {
+				var that = this
+				//兼容微信奇怪的要求，使用蓝牙需要开启位置权限
+				uni.getLocation({
+					type: 'wgs84',
+					success: function(res) {
+						//1. 封装设备imei
+						that.setDeviceIdFromPath(params)
+						//3. 判断蓝牙功能是否打开，蓝牙打开以后才能进行蓝牙初始化
+						that.judgeBlueToothCanUse()
+					},
+					fail() {
+						uni.showModal({
+							title: '',
+							content: '请授予小程序获取位置功能',
+							showCancel: false,
+							success: (res) => {
+								if (res.confirm) {
+									uni.openSetting({
+										success(res) {
+											uni.authorize({
+												scope: 'scope.userLocation',
+												success() {
+													uni.getLocation({
+														type: 'wgs84',
+														success: function(res) {
+															//1. 封装设备imei
+															that.setDeviceIdFromPath(params)
+															//3. 判断蓝牙功能是否打开，蓝牙打开以后才能进行蓝牙初始化
+															that.judgeBlueToothCanUse()
+														}
+													})
+												},
+												fail() {
+													uni.showModal({
+														title: '',
+														content: '请授予小程序获取位置功能后重试',
+														showCancel: false,
+														success: (res) => {
+															if (res.confirm) {
+																uni.reLaunch({
+																	url: '../index/index'
+																})
+
+															}
+														}
+													})
+												}
+											})
+										}
+									})
+								}
+							}
+						})
+					}
+				})
 			}
 
 
@@ -588,10 +660,8 @@
 		},
 		//页面加载时的生命周期函数
 		onLoad(params) {
-			//1. 封装设备imei
-			this.setDeviceIdFromPath(params)
-			//3. 判断蓝牙功能是否打开，蓝牙打开以后才能进行蓝牙初始化
-			this.judgeBlueToothCanUse()
+			this.judgeLocationOpen(params)
+
 		}
 	}
 </script>

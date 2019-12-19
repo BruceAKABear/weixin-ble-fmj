@@ -165,7 +165,31 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};var ownKeys = Object.keys(source);if (typeof Object.getOwnPropertySymbols === 'function') {ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {return Object.getOwnPropertyDescriptor(source, sym).enumerable;}));}ownKeys.forEach(function (key) {_defineProperty(target, key, source[key]);});}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}var uniIcon = function uniIcon() {return __webpack_require__.e(/*! import() | components/uni-icons/uni-icons */ "components/uni-icons/uni-icons").then(__webpack_require__.bind(null, /*! ../../components/uni-icons/uni-icons.vue */ 58));};var _default =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};var ownKeys = Object.keys(source);if (typeof Object.getOwnPropertySymbols === 'function') {ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {return Object.getOwnPropertyDescriptor(source, sym).enumerable;}));}ownKeys.forEach(function (key) {_defineProperty(target, key, source[key]);});}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}var uniIcon = function uniIcon() {return __webpack_require__.e(/*! import() | components/uni-icons/uni-icons */ "components/uni-icons/uni-icons").then(__webpack_require__.bind(null, /*! ../../components/uni-icons/uni-icons.vue */ 58));};var uniNumberBox = function uniNumberBox() {return __webpack_require__.e(/*! import() | components/uni-number-box/uni-number-box */ "components/uni-number-box/uni-number-box").then(__webpack_require__.bind(null, /*! ../../components/uni-number-box/uni-number-box.vue */ 72));};var _default =
+
 
 
 
@@ -185,7 +209,8 @@ var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {
 
   },
   components: {
-    uniIcon: uniIcon },
+    uniIcon: uniIcon,
+    uniNumberBox: uniNumberBox },
 
   methods: _objectSpread({},
   (0, _vuex.mapMutations)(['setGoodsObjectArray', 'setMachObject', 'setVoucherState', 'setCommitGoodsArray']), {
@@ -201,7 +226,7 @@ var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {
 
     },
     //选中商品
-    selectedGoods: function selectedGoods(goods) {
+    selectedGoods: function selectedGoods(value, goods) {
       if (goods.empty) {
         uni.showModal({
           title: '',
@@ -213,31 +238,60 @@ var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {
 
         return;
       }
-      //购买的商品对象
+      //-------------购买的商品对象
       var pAndN = {};
       //货道号
       pAndN.cabinetNo = goods.id;
-      pAndN.goodsCount = 1;
+      pAndN.goodsCount = parseInt(value);
       pAndN.returnCount = 0;
       pAndN.goodsId = goods.goods.id;
-      pAndN.goodsPrice = goods.goods.price;
+      pAndN.goodsPrice = parseFloat(goods.goods.price);
       pAndN.goodsName = goods.goods.name;
-      var gArray = [];
-      gArray.push(pAndN);
-
+      //-----------显示的商品
       var showObj = {};
       showObj.product = goods;
-      showObj.number = 1;
-      var showArray = [];
-      showArray.push(showObj);
+      showObj.number = parseInt(value);
 
-      this.setCommitGoodsArray(gArray);
-      this.setGoodsObjectArray(showArray);
+      var selectedCommitGoodsArray = this.commitGoodsArray;
+      var selectedGoodsObjectArray = this.goodsObjectArray;
+
+      var returnObj = this.containsObejct(selectedCommitGoodsArray, goods);
+      if (returnObj.flag) {
+        if (value == 0) {
+          selectedCommitGoodsArray.splice(returnObj.index, 1);
+          selectedGoodsObjectArray.splice(returnObj.index, 1);
+        } else {
+          selectedCommitGoodsArray[returnObj.index] = pAndN;
+          selectedGoodsObjectArray[returnObj.index] = showObj;
+        }
+      } else {
+        selectedCommitGoodsArray.push(pAndN);
+        selectedGoodsObjectArray.push(showObj);
+      }
+      this.showObjArray = selectedCommitGoodsArray;
+      //先清空
+      this.setCommitGoodsArray([]);
+      //再插入
+      this.setCommitGoodsArray(selectedCommitGoodsArray);
+      this.setGoodsObjectArray(selectedGoodsObjectArray);
       //选中商品，跳转订单页面，显示支付
-      uni.navigateTo({
-        url: '../order/order' });
 
-
+    },
+    containsObejct: function containsObejct(objectArray, productObject) {
+      var returnObj = {};
+      returnObj.flag = false;
+      //如果为空，那就是不包含
+      if (objectArray.length == 0) {
+        return returnObj;
+      } else {
+        for (var i = 0; i < objectArray.length; i++) {
+          if (objectArray[i].goodsId == productObject.goods.id) {
+            returnObj.flag = true;
+            returnObj.index = i;
+          }
+        }
+        return returnObj;
+      }
     },
     callKefu: function callKefu() {
       uni.makePhoneCall({
@@ -351,14 +405,44 @@ var _vuex = __webpack_require__(/*! vuex */ 12);function _objectSpread(target) {
 
         } });
 
+    },
+    gopay: function gopay() {
+      if (this.commitGoodsArray.length == 0) {
+        return;
+      } else {
+        uni.navigateTo({
+          url: '../order/order' });
+
+      }
+
     } }),
 
-
   computed: _objectSpread({},
-  (0, _vuex.mapState)(['deviceImei', 'baseRequestUrl'])),
+  (0, _vuex.mapState)(['deviceImei', 'baseRequestUrl', 'commitGoodsArray', 'goodsObjectArray']), {
+    havaSelectGoods: function havaSelectGoods() {
+      return this.commitGoodsArray.length != 0;
+    },
+    showText: function showText() {
+      var selectedCommitGoodsArray = this.commitGoodsArray;
+      console.log('存在的商品', selectedCommitGoodsArray);
+
+
+      if (selectedCommitGoodsArray.length == 0) {
+        return '未选购商品';
+      } else {
+        var totalP = 0;
+        selectedCommitGoodsArray.forEach(function (item) {
+          totalP = totalP + item.goodsCount * item.goodsPrice;
+
+        });
+        return '总计¥' + totalP.toFixed(2);
+      }
+    } }),
 
   //页面加载时查询运营商的banner
   onLoad: function onLoad() {
+    this.setCommitGoodsArray([]);
+    this.setGoodsObjectArray([]);
     this.queryAllGoods();
   } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))

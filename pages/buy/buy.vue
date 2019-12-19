@@ -6,17 +6,25 @@
 		</view>
 		<!-- 商品列表 -->
 		<view class="goods-list">
-			<view :class="goods.empty?styleEmpty:stylefull " v-for="(goods,index)  in goodsList " :key='index' @tap="selectedGoods(goods)">
+			<view :class="goods.empty?styleEmpty:stylefull " v-for="(goods,index)  in goodsList " :key='index'>
 				<!-- 根据available判断商品是否可用 -->
 				<view class="goods-item-inner">
+					<!-- 产品图片 -->
 					<view class="">
 						<image class="goods-item-inner-pic" :src="goods.goods.imgUrl?goods.goods.imgUrl:defaultImg"></image>
 					</view>
-					<view class="goods-item-inner-name">
-						{{goods.goods.name}}
+					<!-- 产品名称 -->
+					<view class="goods-item-inner-name-price">
+						<view class="goods-item-inner-name">
+							{{goods.goods.name}}
+						</view>
+						<view class="goods-item-inner-price">
+							￥{{goods.goods.price}}
+						</view>
 					</view>
-					<view class="goods-item-inner-price">
-						￥{{goods.goods.price}}
+					<!-- 产品数量选择 -->
+					<view class="goods-item-inner-number">
+						<uni-number-box :value="0" :min="0" :product="goods" :max="goods.stocks" :disabled="goods.empty" @change="selectedGoods"></uni-number-box>
 					</view>
 				</view>
 
@@ -24,7 +32,22 @@
 		</view>
 		<!-- 底部通过 -->
 		<view class="bottom-info">
-			<view class="bottom-item">
+			<view class="bottom-info-addcart">
+				<view class="bottom-info-addcart-img">
+					<image src="../../static/cart.png" style="width: 60rpx;height: 60rpx;"></image>
+				</view>
+
+				<view class="bottom-info-addcart-text">
+					{{showText}}
+				</view>
+
+
+			</view>
+			<view :class="havaSelectGoods?'bottom-info-gopay-yes':'bottom-info-gopay'" @click="gopay">
+				去结算
+			</view>
+
+			<!-- <view class="bottom-item">
 				<uni-icon type="home" color="#B2B2B2" size="50"></uni-icon>
 				<text class="buy-text">旗舰店</text>
 			</view>
@@ -35,7 +58,7 @@
 			<view class="bottom-item" @tap="callKefu()">
 				<uni-icon type="contact" color="#B2B2B2" size="50"></uni-icon>
 				<text class="buy-text">客服</text>
-			</view>
+			</view> -->
 		</view>
 	</view>
 </template>
@@ -46,6 +69,7 @@
 		mapState
 	} from 'vuex'
 	import uniIcon from '../../components/uni-icons/uni-icons.vue'
+	import uniNumberBox from "../../components/uni-number-box/uni-number-box.vue"
 	export default {
 		data() {
 			return {
@@ -61,7 +85,8 @@
 			}
 		},
 		components: {
-			uniIcon
+			uniIcon,
+			uniNumberBox
 		},
 		methods: {
 			...mapMutations(['setGoodsObjectArray', 'setMachObject', 'setVoucherState', 'setCommitGoodsArray']),
@@ -69,7 +94,7 @@
 			openUserPro() {
 				uni.showModal({
 					title: '用户协议',
-					content: this.userProtocol?this.userProtocol:'默认用户协议',
+					content: this.userProtocol ? this.userProtocol : '默认用户协议',
 					showCancel: false,
 					success: (res) => {
 						if (res.confirm) {}
@@ -77,7 +102,7 @@
 				})
 			},
 			//选中商品
-			selectedGoods(goods) {
+			selectedGoods(value, goods) {
 				if (goods.empty) {
 					uni.showModal({
 						title: '',
@@ -89,31 +114,60 @@
 					})
 					return
 				}
-				//购买的商品对象
+				//-------------购买的商品对象
 				let pAndN = {}
 				//货道号
 				pAndN.cabinetNo = goods.id
-				pAndN.goodsCount = 1
+				pAndN.goodsCount = parseInt(value)
 				pAndN.returnCount = 0
 				pAndN.goodsId = goods.goods.id
-				pAndN.goodsPrice = goods.goods.price
+				pAndN.goodsPrice = parseFloat(goods.goods.price)
 				pAndN.goodsName = goods.goods.name
-				let gArray = []
-				gArray.push(pAndN)
-
+				//-----------显示的商品
 				let showObj = {}
 				showObj.product = goods
-				showObj.number = 1
-				let showArray = []
-				showArray.push(showObj)
+				showObj.number = parseInt(value)
 
-				this.setCommitGoodsArray(gArray)
-				this.setGoodsObjectArray(showArray)
+				let selectedCommitGoodsArray = this.commitGoodsArray
+				let selectedGoodsObjectArray = this.goodsObjectArray
+
+				let returnObj = this.containsObejct(selectedCommitGoodsArray, goods)
+				if (returnObj.flag) {
+					if (value == 0) {
+						selectedCommitGoodsArray.splice(returnObj.index, 1);
+						selectedGoodsObjectArray.splice(returnObj.index, 1);
+					} else {
+						selectedCommitGoodsArray[returnObj.index] = pAndN
+						selectedGoodsObjectArray[returnObj.index] = showObj
+					}
+				} else {
+					selectedCommitGoodsArray.push(pAndN)
+					selectedGoodsObjectArray.push(showObj)
+				}
+				this.showObjArray = selectedCommitGoodsArray
+				//先清空
+				this.setCommitGoodsArray([])
+				//再插入
+				this.setCommitGoodsArray(selectedCommitGoodsArray)
+				this.setGoodsObjectArray(selectedGoodsObjectArray)
 				//选中商品，跳转订单页面，显示支付
-				uni.navigateTo({
-					url: '../order/order'
-				})
 
+			},
+			containsObejct(objectArray, productObject) {
+				let returnObj = {}
+				returnObj.flag = false
+				//如果为空，那就是不包含
+				if (objectArray.length == 0) {
+					return returnObj
+				} else {
+					for (let i = 0; i < objectArray.length; i++) {
+						if (objectArray[i].goodsId == productObject.goods.id) {
+							returnObj.flag = true
+							returnObj.index = i
+						}
+					}
+					return returnObj
+				}
 			},
 			callKefu() {
 				uni.makePhoneCall({
@@ -183,7 +237,7 @@
 														success: (res) => {
 															if (res.confirm) {
 																uni.reLaunch({
-																	url:'../index/index'
+																	url: '../index/index'
 																})
 															}
 														}
@@ -227,14 +281,44 @@
 
 					}
 				});
-			}
+			},
+			gopay() {
+				if (this.commitGoodsArray.length == 0) {
+					return
+				} else {
+					uni.navigateTo({
+						url: '../order/order'
+					})
+				}
 
+			}
 		},
 		computed: {
-			...mapState(['deviceImei', 'baseRequestUrl'])
+			...mapState(['deviceImei', 'baseRequestUrl', 'commitGoodsArray', 'goodsObjectArray']),
+			havaSelectGoods() {
+				return this.commitGoodsArray.length != 0
+			},
+			showText() {
+				let selectedCommitGoodsArray = this.commitGoodsArray
+				console.log('存在的商品',selectedCommitGoodsArray)
+				
+				
+				if (selectedCommitGoodsArray.length == 0) {
+					return '未选购商品'
+				} else {
+					let totalP = 0
+					selectedCommitGoodsArray.forEach(function(item) {
+						totalP = totalP + (item.goodsCount * item.goodsPrice)
+
+					})
+					return '总计¥' + totalP.toFixed(2)
+				}
+			}
 		},
 		//页面加载时查询运营商的banner
 		onLoad() {
+			this.setCommitGoodsArray([])
+			this.setGoodsObjectArray([])
 			this.queryAllGoods()
 		}
 	}
@@ -251,68 +335,127 @@
 	}
 
 	.operator-banner-pic {
-		width: 700rpx;
+		width: 100%;
 	}
 
 	.goods-list {
 		display: flex;
-		width: 100%;
 		flex-wrap: wrap;
-		flex-direction: row;
 		margin-bottom: 10vh;
+		padding: 10rpx;
+		justify-content: space-between;
+
+	}
+
+	.goods-list:after {
+		content: '';
+		width: 30%;
 	}
 
 	.goods-item {
-		padding: 20rpx;
 		display: flex;
 		flex-direction: column;
 		text-align: center;
-		width: 320rpx;
-		padding: 5rpx;
-		margin-left: 30rpx;
+		padding-bottom: 15rpx;
 	}
 
+
 	.goods-item-empty {
-		padding: 20rpx;
-		display: flex;
-		flex-direction: column;
-		text-align: center;
-		width: 320rpx;
-		padding: 5rpx;
-		margin-left: 30rpx;
 		opacity: 0.4;
 	}
 
 	.goods-item-inner {
 		margin: 10rpx;
-		background-color: #EEEEEE;
-		padding: 10rpx;
+		background-color: #FFFFFF;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 	}
 
 	.goods-item-inner-pic {
-		width: 100rpx;
-		height: 100rpx;
+		width: 190rpx;
+		height: 190rpx;
+	}
+
+	.goods-item-inner-name-price {
+		margin-top: 20rpx;
+		display: flex;
+		font-size: 25rpx;
+		align-items: center;
+		justify-content: space-between;
 	}
 
 	.goods-item-inner-name {
 		font-size: 25rpx;
+		max-width: 120rpx;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
 	.goods-item-inner-price {
-		font-size: 20rpx;
+		font-size: 28rpx;
 		color: #E80080;
+	}
+
+	.goods-item-inner-number {
+		margin-top: 20rpx;
+		width: 200rpx;
 	}
 
 	.bottom-info {
 		position: fixed;
+		z-index: 100;
+		height: 100rpx;
 		bottom: 0;
 		display: flex;
 		width: 100%;
 		justify-content: center;
-		padding-bottom: 10rpx;
-		padding-top: 10rpx;
 		border-top: solid 1rpx #BBBBBB;
-		background-color: #FFFFFF;
+		background-color: #515151;
+	}
+
+	.bottom-info-addcart {
+		width: 70%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.bottom-info-addcart-img {
+		background-color: #515151;
+		padding: 20rpx;
+		border-radius: 60rpx;
+		position: absolute;
+		bottom: 10rpx;
+		left: 60rpx;
+	}
+
+	.bottom-info-addcart-text {
+		color: #FFFFFF;
+		padding-left: 15rpx;
+	}
+
+	.bottom-info-gopay {
+		display: flex;
+		width: 30%;
+		color: #FFFFFF;
+		background-color: #666;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.bottom-info-gopay-yes {
+		display: flex;
+		width: 30%;
+		color: #FFFFFF;
+		background-color: #ff5f5f;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.bottom-info-gopay-yes:active {
+		opacity: 0.5;
 	}
 
 	.bottom-item {

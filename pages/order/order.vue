@@ -173,65 +173,135 @@
 										success: (res) => {
 											if (res.data.code === 1) {
 												let chargeTimeOrder = res.data.order
-												uni.writeBLECharacteristicValue({
-													deviceId: that.deviceId,
-													serviceId: that.serviceId,
-													characteristicId: that.writeServiceId,
-													value: String2Ab(chargeTimeOrder),
-													success(res) {
-														//监听响应的命令
-														//定时判断是否相同
-														var chargeIntervalTimmerId = setInterval(function() {
-															if (chargeTimeOrder.indexOf(that.responseOrder) != -1) {
-																//设置在充电中
-																clearInterval(chargeIntervalTimmerId)
-																clearTimeout(chargeTimeOutTimmerId)
-																//下发Q06=1@
-																uni.writeBLECharacteristicValue({
-																	deviceId: that.deviceId,
-																	serviceId: that.serviceId,
-																	characteristicId: that.writeServiceId,
-																	value: String2Ab(that.confirmOrder),
-																	success(res) {
+												console.log('实际命令长度为',chargeTimeOrder.length)
+												if (chargeTimeOrder.length <= 40) {
+													uni.writeBLECharacteristicValue({
+														deviceId: that.deviceId,
+														serviceId: that.serviceId,
+														characteristicId: that.writeServiceId,
+														value: String2Ab(chargeTimeOrder),
+														success(res) {
+															//监听响应的命令
+															//定时判断是否相同
+															var chargeIntervalTimmerId = setInterval(function() {
+																if (chargeTimeOrder.indexOf(that.responseOrder) != -1) {
+																	//设置在充电中
+																	clearInterval(chargeIntervalTimmerId)
+																	clearTimeout(chargeTimeOutTimmerId)
+																	//下发Q06=1@
+																	uni.writeBLECharacteristicValue({
+																		deviceId: that.deviceId,
+																		serviceId: that.serviceId,
+																		characteristicId: that.writeServiceId,
+																		value: String2Ab(that.confirmOrder),
+																		success(res) {
+																			//关闭蓝牙连接
+																			uni.closeBLEConnection({
+																				deviceId: that.deviceId,
+																				success(res) {
+																					console.log(res)
+																				}
+																			})
+																			uni.hideLoading();
+																			//跳转到充电页面
+																			uni.reLaunch({
+																				url: '../buyfinish/buyfinish'
+																			})
+																		}
+																	})
+																}
+															}, 200)
+															//定时判断,如果5秒以后还不对，那么就是伪造的直接推出
+															var chargeTimeOutTimmerId = setTimeout(function() {
+																if (chargeTimeOrder.indexOf(that.responseOrder) === -1) {
+																	clearInterval(chargeIntervalTimmerId)
+																	//关闭蓝牙连接
+																	uni.hideLoading();
+																	uni.showModal({
+																		title: '',
+																		content: '蓝牙响应失败,请重新扫码',
+																		showCancel: false,
+																		success: (res) => {
+																			if (res.confirm) {
+																				uni.reLaunch({
+																					url: '../index/index'
+																				})
+
+																			}
+																		}
+																	})
+																}
+															}, 3000);
+														}
+													})
+
+												} else {
+													let orderTime = Math.floor(chargeTimeOrder.length / 40)
+													for (let i = 0; i <= orderTime; i++) {
+														console.log('实际命令为',chargeTimeOrder)
+														console.log('第' + i + '次的命令', chargeTimeOrder.substring(i * 40, (i+1)*40))
+
+														uni.writeBLECharacteristicValue({
+															deviceId: that.deviceId,
+															serviceId: that.serviceId,
+															characteristicId: that.writeServiceId,
+															value: String2Ab(chargeTimeOrder.substring(i * 40, (i+1)*40)),
+															success(res) {
+																//监听响应的命令
+																//定时判断是否相同
+																// var chargeIntervalTimmerId = setInterval(function() {
+																// 	if (chargeTimeOrder.indexOf(that.responseOrder) != -1) {
+																		//设置在充电中
+																		// clearInterval(chargeIntervalTimmerId)
+																		// clearTimeout(chargeTimeOutTimmerId)
+																		//下发Q06=1@
+																		// uni.writeBLECharacteristicValue({
+																		// 	deviceId: that.deviceId,
+																		// 	serviceId: that.serviceId,
+																		// 	characteristicId: that.writeServiceId,
+																		// 	value: String2Ab(that.confirmOrder),
+																		// 	success(res) {
+																		// 		//关闭蓝牙连接
+																		// 		uni.closeBLEConnection({
+																		// 			deviceId: that.deviceId,
+																		// 			success(res) {
+																		// 				console.log(res)
+																		// 			}
+																		// 		})
+																		// 		uni.hideLoading();
+																		// 		//跳转到充电页面
+																		// 		uni.reLaunch({
+																		// 			url: '../buyfinish/buyfinish'
+																		// 		})
+																		// 	}
+																		// })
+																// 	}
+																// }, 200)
+																//定时判断,如果5秒以后还不对，那么就是伪造的直接推出
+																var chargeTimeOutTimmerId = setTimeout(function() {
+																	if (chargeTimeOrder.indexOf(that.responseOrder) === -1) {
+																		//clearInterval(chargeIntervalTimmerId)
 																		//关闭蓝牙连接
-																		uni.closeBLEConnection({
-																			deviceId: that.deviceId,
-																			success(res) {
-																				console.log(res)
+																		uni.hideLoading();
+																		uni.showModal({
+																			title: '',
+																			content: '蓝牙响应失败,请重新扫码',
+																			showCancel: false,
+																			success: (res) => {
+																				if (res.confirm) {
+																					uni.reLaunch({
+																						url: '../index/index'
+																					})
+
+																				}
 																			}
 																		})
-																		uni.hideLoading();
-																		//跳转到充电页面
-																		uni.reLaunch({
-																			url: '../buyfinish/buyfinish'
-																		})
 																	}
-																})
+																}, 3000);
 															}
-														}, 200)
-														//定时判断,如果5秒以后还不对，那么就是伪造的直接推出
-														var chargeTimeOutTimmerId = setTimeout(function() {
-															if (chargeTimeOrder.indexOf(that.responseOrder) === -1) {
-																clearInterval(chargeIntervalTimmerId)
-																//关闭蓝牙连接
-																uni.hideLoading();
-																uni.showModal({
-																	title: '',
-																	content: '蓝牙响应失败,请重新扫码',
-																	showCancel: false,
-																	success: (res) => {
-																		if (res.confirm) {
-																			uni.reLaunch({
-																				url: '../index/index'
-																			})
-
-																		}
-																	}
-																})
-															}
-														}, 3000);
+														})
 													}
-												})
+												}
 
 											} else {
 												//服务器响应失败
@@ -661,6 +731,10 @@
 	.list-content-name {
 		margin-left: 20rpx;
 		padding: 0;
+		max-width: 350rpx;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
 	.list-content-number {
